@@ -1,7 +1,7 @@
 package ma.app.productsapp;
 
-import ma.enset.productsapp.entities.Product;
-import ma.enset.productsapp.repositories.ProductRepository;
+import ma.app.productsapp.entities.Product;
+import ma.app.productsapp.repositories.ProductRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

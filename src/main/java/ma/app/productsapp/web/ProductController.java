@@ -7,13 +7,14 @@ import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.hateoas.PagedModel;
@@ -21,26 +22,28 @@ import org.springframework.hateoas.PagedModel;
 public class ProductController{
     @Autowired
     private ProductRepository productRepository;
-    @Autowired
-    private KeycloakRestTemplate keycloakRestTemplate;
+    //@Autowired
+    //private KeycloakRestTemplate keycloakRestTemplate;
 
 
     @GetMapping("/")
+    @PreAuthorize("hasRole('client-user')")
     public String index(){
         return "index";
     }
     @GetMapping("/products")
+   @PreAuthorize("hasRole('client-admin')")
     public String products(Model model){
         model.addAttribute("products",productRepository.findAll());
         return "products";
     }
-    @GetMapping("/suppliers")
+/*    @GetMapping("/suppliers")
     public String suppliers(Model model){
         PagedModel<Supplier> pageSuppliers=
                 keycloakRestTemplate.getForObject("http://localhost:8083/suppliers",PagedModel.class);
         model.addAttribute("suppliers",pageSuppliers);
         return "suppliers";
-    }
+    }*/
     @ExceptionHandler(Exception.class)
     public String exceptionHandler(Exception e, Model model){
         model.addAttribute("errorMessage","problème d'autorisation");
