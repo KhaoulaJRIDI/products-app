@@ -1,87 +1,64 @@
 package ma.app.productsapp.sec;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
-import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
-
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
+class SecurityConfig {
+    private final KeycloakLogoutHandler keycloakLogoutHandler;
 
-public class SecurityConfig {
-    private final JwtAuthConverter jwtAuthConverter;
-    private AuthenticationManagerBuilder authManager;
-
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-
-
-
-        http
-                .authorizeHttpRequests((requests) -> requests.requestMatchers(new AntPathRequestMatcher("/h2-console/**")).permitAll());
-        http.headers().frameOptions().disable();
-        http.authorizeHttpRequests((requests) -> requests.requestMatchers(new AntPathRequestMatcher("/index")).permitAll());
-        http.authorizeHttpRequests((requests) -> requests.requestMatchers(new AntPathRequestMatcher("/products")).authenticated());
-
-        http   .httpBasic(Customizer.withDefaults())
-                .logout(logout -> logout.logoutSuccessUrl("/").permitAll())
-                .oauth2Login(oauth2 ->
-                        oauth2.userInfoEndpoint(userInfo -> userInfo.oidcUserService(oidcUserService())));
-
-
-            http
-                .oauth2ResourceServer()
-                .jwt()
-                .jwtAuthenticationConverter(jwtAuthConverter);
-
-        http
-                .sessionManagement()
-                .sessionCreationPolicy(STATELESS);
-
-
-        http
-                .cors() // by default uses a Bean by the name of corsConfigurationSource
-                .and().csrf().disable()
-                .formLogin().disable()
-                 .httpBasic().disable();
-
-            return http.build();
+    SecurityConfig(KeycloakLogoutHandler keycloakLogoutHandler) {
+        this.keycloakLogoutHandler = keycloakLogoutHandler;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
+    }
+
+    @Order(1)
+    @Bean
+    public SecurityFilterChain clientFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .requestMatchers(new AntPathRequestMatcher("/"))
+                .permitAll()
+                .anyRequest()
+                .authenticated();
+        http.oauth2Login()
+                .and()
+                .logout()
+                .addLogoutHandler(keycloakLogoutHandler)
+                .logoutSuccessUrl("/");
+        return http.build();
+    }
+
+    @Order(2)
+    @Bean
+    public SecurityFilterChain resourceServerFilterChain(HttpSecurity http) throws Exception {
+        http.authorizeRequests()
+                .requestMatchers(new AntPathRequestMatcher("/*"))
+                .hasRole("USER")
+                .anyRequest()
+                .authenticated();
+        http.oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));
+        return http.build();
     }
 
     @Bean
-    public OidcUserService oidcUserService() {
-        return new CustomOidcUserService();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return new CustomUserDetailsService();
-    }
-
-    @Bean
-    public AuthenticationFailureHandler customAuthenticationFailureHandler() {
-        return (request, response, exception) -> {
-            // Customize the behavior on login failure (e.g., redirect to a custom error page)
-            response.sendRedirect("/login?error");
-        };
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .build();
     }
 }

@@ -37,7 +37,7 @@ public class ProductController{
         return "index";
     }
     @GetMapping("/products")
-    @PreAuthorize("hasAuthority('client-admin')")
+    @PreAuthorize("hasRole('client-admin')")
     public String products(Model model){
         model.addAttribute("products",productRepository.findAll());
        return "products";
