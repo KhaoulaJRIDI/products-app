@@ -10,14 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.hateoas.PagedModel;
+
 @Controller
 public class ProductController{
     @Autowired
@@ -26,16 +27,21 @@ public class ProductController{
     //private KeycloakRestTemplate keycloakRestTemplate;
 
 
+    @GetMapping("/index")
+    public String indexing(){
+        return "index";
+    }
     @GetMapping("/")
     @PreAuthorize("hasRole('client-user')")
     public String index(){
         return "index";
     }
     @GetMapping("/products")
-   @PreAuthorize("hasRole('client-admin')")
+    @PreAuthorize("hasAuthority('client-admin')")
     public String products(Model model){
         model.addAttribute("products",productRepository.findAll());
-        return "products";
+       return "products";
+
     }
 /*    @GetMapping("/suppliers")
     public String suppliers(Model model){
@@ -51,7 +57,7 @@ public class ProductController{
     }
 
 
-    @GetMapping("/jwt")
+    /*@GetMapping("/jwt")
     @ResponseBody
     public Map<String,String> map(HttpServletRequest request){
         KeycloakAuthenticationToken token =(KeycloakAuthenticationToken) request.getUserPrincipal();
@@ -60,7 +66,7 @@ public class ProductController{
         Map<String,String> map = new HashMap<>();
         map.put("access_token", keycloakSecurityContext.getTokenString());
         return map;
-    }
+    }*/
 }
 @Data
 class Supplier{
