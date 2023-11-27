@@ -43,21 +43,21 @@ public class ProductController{
        return "products";
 
     }
-/*    @GetMapping("/suppliers")
+/* @GetMapping("/suppliers")
     public String suppliers(Model model){
         PagedModel<Supplier> pageSuppliers=
                 keycloakRestTemplate.getForObject("http://localhost:8083/suppliers",PagedModel.class);
         model.addAttribute("suppliers",pageSuppliers);
         return "suppliers";
-    }*/
+    }
     @ExceptionHandler(Exception.class)
     public String exceptionHandler(Exception e, Model model){
         model.addAttribute("errorMessage","problème d'autorisation");
         return "errors";
-    }
+    }*/
 
 
-    /*@GetMapping("/jwt")
+    @GetMapping("/jwt")
     @ResponseBody
     public Map<String,String> map(HttpServletRequest request){
         KeycloakAuthenticationToken token =(KeycloakAuthenticationToken) request.getUserPrincipal();
@@ -66,7 +66,7 @@ public class ProductController{
         Map<String,String> map = new HashMap<>();
         map.put("access_token", keycloakSecurityContext.getTokenString());
         return map;
-    }*/
+    }
 }
 @Data
 class Supplier{
