@@ -26,10 +26,9 @@ public class JwtAuthConverter implements Converter<Jwt,AbstractAuthenticationTok
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter =
             new JwtGrantedAuthoritiesConverter();
 
-    @Value("${jwt.auth.converter.principle-attribute}")
-    private String principleAttribute;
-    @Value("${jwt.auth.converter.resource-id}")
-    private String resourceId;
+
+    private final String principleAttribute="preferred-username";
+    private final String resourceId="products-app";
 
     @Override
     public AbstractAuthenticationToken convert(@NonNull Jwt jwt) {

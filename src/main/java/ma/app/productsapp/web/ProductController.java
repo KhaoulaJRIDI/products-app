@@ -8,6 +8,7 @@ import org.keycloak.adapters.springsecurity.client.KeycloakRestTemplate;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +21,7 @@ import java.util.Map;
 import org.springframework.hateoas.PagedModel;
 
 @Controller
+
 public class ProductController{
     @Autowired
     private ProductRepository productRepository;
@@ -32,12 +34,12 @@ public class ProductController{
         return "index";
     }
     @GetMapping("/")
-    @PreAuthorize("hasRole('client-user')")
+    @PreAuthorize("hasRole('ROLE_client-user')")
     public String index(){
         return "index";
     }
     @GetMapping("/products")
-    @PreAuthorize("hasRole('client-admin')")
+    @PreAuthorize("hasRole('ROLE_client-admin')")
     public String products(Model model){
         model.addAttribute("products",productRepository.findAll());
        return "products";
