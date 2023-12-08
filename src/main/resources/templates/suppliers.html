@@ -17,11 +17,11 @@
                      <tr>
                          <th>ID</th><th>Name</th><th>Email</th>
                      </tr>
-                     <tr>
-                         <td>--</td>
-                         <td>--</td>
-                         <td>--</td>
-                         <td>--</td>
+                     <tr th:each="s:${suppliers}">
+                         <td th:text="${s.id}"></td>
+                         <td th:text="${s.name}"></td>
+                         <td th:text="${s.email}"></td>
+
                      </tr>
                  </table>
              </div>

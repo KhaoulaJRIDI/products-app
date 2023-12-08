@@ -18,21 +18,23 @@ public class OidcUserToSecurityUserConverter implements Converter<OidcUser, Secu
         securityUser.setUserName(oidcUser.getName());
 
 
-
         // Convert OidcUser authorities to SimpleGrantedAuthority objects
-        securityUser.setGrantedAuthorityList(oidcUser.getAuthorities()
+       /* securityUser.setGrantedAuthorityList(oidcUser.getAuthorities()
                 .stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
                 .collect(Collectors.toList()));
 
         return securityUser;
-    }
+    }*/
 
-    public Collection<SimpleGrantedAuthority> convertAuthorities(OidcUser oidcUser) {
+    /*public Collection<SimpleGrantedAuthority> convertAuthorities(OidcUser oidcUser) {
         return oidcUser.getAuthorities()
                 .stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getAuthority()))
                 .collect(Collectors.toList());
-    }
-}
+    }*/
 
+        return securityUser;
+    }
+
+}

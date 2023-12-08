@@ -1,7 +1,9 @@
 package ma.app.productsapp;
 
 import ma.app.productsapp.entities.Product;
+import ma.app.productsapp.mappers.GrantedAuthoritiesExtractor;
 import ma.app.productsapp.repositories.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -21,5 +23,6 @@ public class ProductsAppApplication {
             productRepository.save(new Product(null,"Smartphone",1600,34));
         };
     }
+
 
 }
